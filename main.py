@@ -1,10 +1,8 @@
-# =========================================
-# 1. Install (Run once)
-# =========================================
+
 !pip install deep-translator
-# =========================================
+
 # 2. Imports
-# =========================================
+
 import numpy as np
 import pandas as pd
 import re
@@ -18,10 +16,8 @@ from sklearn.metrics import classification_report
 from deep_translator import GoogleTranslator
 from functools import lru_cache
 
-
-# =========================================
 # 3. Hinglish + English Dictionary
-# =========================================
+
 HINGLISH_WORDS = {
     "kya", "kaise", "hai", "ho", "kyu", "nahi", "haan",
     "bhai", "yaar", "tum", "mera", "tera", "kar", "raha",
@@ -41,10 +37,8 @@ COMMON_ENGLISH = {
     "i","you","we","they","he","she","it"
 }
 
-
-# =========================================
 # 4. Dataset
-# =========================================
+
 data = [
     ("नमस्ते आप कैसे हैं?", "Hindi"),
     ("Hello, how are you?", "English"),
@@ -74,16 +68,16 @@ extra_english = [
 data = data * 40 + extra_english * 30
 df = pd.DataFrame(data, columns=["text", "language"])
 
-# =========================================
+
 # 5. Encode Labels
-# =========================================
+
 le = LabelEncoder()
 y = le.fit_transform(df["language"])
 
 
-# =========================================
+
 # 6. Vectorization
-# =========================================
+
 vectorizer = TfidfVectorizer(
     analyzer='char_wb',
     ngram_range=(2, 5),
@@ -92,25 +86,18 @@ vectorizer = TfidfVectorizer(
 
 X = vectorizer.fit_transform(df["text"])
 
-
-# =========================================
 # 7. Train-Test Split
-# =========================================
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-
-# =========================================
 # 8. Model
-# =========================================
+
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
 
-
-# =========================================
 # 9. Evaluation
-# =========================================
+
 print("\n📊 Evaluation:\n")
 print(classification_report(
     y_test,
@@ -118,10 +105,8 @@ print(classification_report(
     target_names=le.classes_
 ))
 
-
-# =========================================
 # 10. Script Detection
-# =========================================
+
 def detect_script(text):
     if re.search(r'[\u0900-\u097F]', text):
         return "Devanagari"
@@ -129,10 +114,8 @@ def detect_script(text):
         return "Latin"
     return "Unknown"
 
-
-# =========================================
 # 11. Hinglish Detection (Improved)
-# =========================================
+
 def is_hinglish(text):
     words = re.findall(r'\w+', text.lower())
     if not words:
@@ -141,10 +124,7 @@ def is_hinglish(text):
     count = sum(1 for w in words if w in HINGLISH_WORDS)
     return count >= 1 and len(words) >= 2
 
-
-# =========================================
 # 12. Predict Language (FINAL)
-# =========================================
 def predict_language(text, threshold=0.6):
     text_clean = text.lower().strip()
     words = re.findall(r'\w+', text_clean)
@@ -197,9 +177,7 @@ def predict_language(text, threshold=0.6):
     return f"{pred_lang} ({max_conf:.2f})"
 
 
-# =========================================
-# 13. Word-wise Detection
-# =========================================
+# 13. Word-wise Detectio
 def detect_mixed(text):
     words = re.findall(r'\w+', text.lower())
 
@@ -227,8 +205,6 @@ def detect_mixed(text):
         results.append(f"{word} → {lang} ({conf:.2f})")
 
     return "\n".join(results)
-
-
 # =========================================
 # 14. Translation
 # =========================================
